@@ -1,0 +1,58 @@
+// Tudor Maria - Elena 324CC
+	Client web. Comunicatie cu REST API.
+
+Nota: Am folosit doua sleep days.
+
+La aceasta tema, am implementat toate cerintele si am tratat toate cazurile de
+eroare mentionate.
+
+Am preluat din scheletul laboratorului 9 urmatoarele fisiere: buffer.c, buffer.h,
+helpers.c, helpers.h, requests.c si requests.h. Am completat/modificat in
+requests.c functiile de compute pentru a se potrivi mai bine cu implementarea mea.
+In plus, am adaugat fisierele parson.c si parson.h pentru a putea lucra cu libraria
+JSON (implementata de kgabis - https://github.com/kgabis/parson), pe care am ales-o
+pentru ca am vrut sa ma familiarizez cu ea, fiind una dintre cele mai populare si
+pentru ca mi s-a parut destul de usor de folosit fiind scrisa in C.
+
+Implementarea principala a cerintei se afla in client.c, unde am utilizat un loop
+infinit in care citesc comanda primita si decid daca este nevoie sa trimit o
+eroare. Daca totul este in regula apelez pentru fiecare comanda functia cu acelasi
+nume. Se iese din bucla cand primeste "exit".
+
+La fiecare repetitie, se deschide un socket si se asteapta citirea de la tastatura
+a unui string. Se foloseste strcmp ca sa determine ce fel de operatie doreste
+utilizatorul sa realizeze. Initial login_cookies si token sunt NULL, iar acestea
+reprezinta datele pe care le foloseste serverul pentru a afla anumite informatii
+despre permisiuni. La comanda de logout este eliberata memoria pentru aceste doua
+variabile si sunt setate ca NULL din nou pentru a nu oferi acces unui utilizator
+care nu il detine.
+
+Functiile register si login sunt asemanatoare, de aceea am incercat sa implementez
+functii ajutatoare precum read_credentials si send_JSON pentru a nu avea cod duplicat.
+O problema pe care am intalnit-o la implementare in acest sens este faptul ca initial
+in read_credentials se trimiteau erorile si se inchide executia la prima eroare, insa
+checker-ul avea nevoie sa citeasca toti parametrii inainte de a afisa eroarea (ex:
+username-ul era gresit, dar trebuia sa citesc si password inainte sa dau return).
+De aceea, am adaugat valorile de 1 la retur pentru erori. De asemenea, pentru ca
+toate citirile se fac cu ajutorul acestei functii am adaugat si variabila verify
+pentru diferitele erori care trebuiesc tratate diferit in functie de parametrul
+citit (am detaliat in cod).
+
+Functiile enter_library, get_books, get_book si add_book sunt si ele similare:
+se citesc datele de la tastatura daca e cazul, se trimite un GET / POST request
+si  se printeaza raspunsul. In functia delete_book se trimite in schimb un DELETE
+request. In requests.c sunt implementate functiile care se ocupa de cereri. Am
+combinat cererile de GET si DELETE, adaugand la functia initiala un camp type
+pentru a forma corect cererea.
+
+Tratarea erorilor are loc de fiecare data cand primesc o comanda noua in main
+verificand cookie-urile de login sau cand citesc un parametru de la tastatura
+(atentie la spatii pentru username si password sau la litere pentru id si
+page_count) sau cand primesc un raspuns de la server.
+
+Concluzii: Partea cea mai grea la aceasta tema a fost sa inteleg cum se face
+register si get_books (restul functiilor s-au legat foarte mult de ele doua),
+sa imi dau seama ce parametrii trebuie sa folosesc pentru cererile GET/
+POST/ DELETE (cand este necesar sa folosesc token-ul si cand cookies) si sa
+folosesc functiile potrivite pentru JSON pentru a face implementarea cat mai
+accesibila.
